@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordenia · La oficina de su administración</title>
+<meta name="description" content="Ordenia es la aplicación de escritorio para administradores de propiedad horizontal: tareas, llamados de atención, PQRS, reservas y documentos de todos sus conjuntos, con un asistente de IA que redacta y usted aprueba.">
+<link rel="icon" href="img/icono.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tablero: #101c2e;
+    --tablero-pista: #26324a;
+    --tablero-texto: #f2f2ee;
+    --tablero-suave: #9aa3b2;
+    --lima: #c6f16d;
+    --sobre-lima: #101418;
+    --lienzo: #ecebe6;
+    --tarjeta: #f8f7f3;
+    --texto: #15171a;
+    --texto-2: #55585e;
+    --borde: rgba(16, 28, 46, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --lienzo: #121417;
+      --tarjeta: #1b1e23;
+      --texto: #eeeeea;
+      --texto-2: #a3a7ae;
+      --borde: rgba(255, 255, 255, 0.08);
+      --tablero: #17233b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Urbanist', 'Segoe UI', system-ui, sans-serif;
+    background: var(--lienzo);
+    color: var(--texto);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  a { color: inherit; }
+  .ancho { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+
+  /* Portada */
+  .portada { background: var(--tablero); color: var(--tablero-texto); border-radius: 0 0 36px 36px; }
+  nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; }
+  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .marca img.emblema { height: 34px; }
+  .marca .nombre { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--tablero-texto); }
+  .enlaces { display: flex; align-items: center; gap: 22px; font-size: 15px; color: var(--tablero-suave); }
+  .enlaces a { text-decoration: none; }
+  .enlaces a:hover { color: var(--tablero-texto); }
+  .boton {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 48px; padding: 0 26px; border-radius: 999px;
+    background: var(--lima); color: var(--sobre-lima);
+    font-weight: 700; font-size: 16px; text-decoration: none; border: 0;
+  }
+  .boton.chico { height: 38px; padding: 0 18px; font-size: 14px; }
+  .boton.borde { background: transparent; color: var(--tablero-texto); box-shadow: inset 0 0 0 1.5px var(--tablero-pista); }
+  .heroe {
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center;
+    padding: 48px 0 72px;
+  }
+  .heroe h1 { font-size: 54px; line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 18px; font-weight: 800; }
+  .heroe h1 em { font-style: normal; color: var(--lima); }
+  .heroe p { color: var(--tablero-suave); font-size: 19px; margin: 0 0 28px; max-width: 520px; }
+  .heroe .acciones { display: flex; gap: 12px; flex-wrap: wrap; }
+  .heroe small { display: block; margin-top: 18px; color: var(--tablero-suave); font-size: 14px; }
+
+  /* Vista de Hoy, con datos inventados */
+  .ventana {
+    background: #e9e8e3; color: #15171a; border-radius: 22px; padding: 16px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  }
+  .ventana-barra { display: flex; gap: 6px; margin-bottom: 12px; }
+  .ventana-barra i { width: 10px; height: 10px; border-radius: 50%; background: #c9c7c0; }
+  .agenda { display: flex; align-items: center; gap: 10px; background: var(--tablero); border-radius: 999px; padding: 6px 6px 6px 16px; color: #f2f2ee; font-size: 13px; }
+  .agenda span.lima { flex: 1; background: var(--lima); color: #101418; border-radius: 999px; padding: 7px 14px; font-weight: 600; }
+  .cifras { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .cifra { background: #f8f7f3; border-radius: 16px; padding: 12px; font-size: 12px; color: #55585e; }
+  .cifra b { display: block; font-size: 28px; color: #15171a; line-height: 1.1; }
+  .cifra.lima { background: var(--lima); color: #101418; }
+  .cifra.lima b { color: #101418; }
+  .heroe-cifra { background: var(--tablero); color: #f2f2ee; display: flex; align-items: center; gap: 12px; }
+  .heroe-cifra b { color: #f2f2ee; }
+  .heroe-cifra span { color: #9aa3b2; }
+  .barras { background: #f8f7f3; border-radius: 16px; padding: 14px; margin-top: 10px; font-size: 12px; }
+  .barras h4 { margin: 0 0 10px; font-size: 13px; }
+  .barra { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 10px; margin: 6px 0; }
+  .barra span { display: flex; gap: 2px; }
+  .barra i { display: block; height: 12px; }
+  .barra i.v { background: var(--tablero); }
+  .barra i.a { background: #b4e05a; border-radius: 0 4px 4px 0; }
+
+  /* Secciones */
+  section { padding: 84px 0 0; }
+  .titulo { max-width: 680px; margin-bottom: 36px; }
+  .titulo .pre { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texto-2); margin-bottom: 10px; }
+  .titulo h2 { font-size: 38px; line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 12px; font-weight: 800; }
+  .titulo p { color: var(--texto-2); margin: 0; }
+  .rejilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .tarjeta { background: var(--tarjeta); border-radius: 24px; padding: 26px; border: 1px solid var(--borde); }
+  .tarjeta h3 { margin: 14px 0 6px; font-size: 20px; }
+  .tarjeta p { margin: 0; color: var(--texto-2); font-size: 16px; }
+  .tarjeta.oscura { background: var(--tablero); color: var(--tablero-texto); border: 0; }
+  .tarjeta.oscura p { color: var(--tablero-suave); }
+  .tarjeta.lima { background: var(--lima); color: var(--sobre-lima); border: 0; }
+  .tarjeta.lima p { color: #2c3a12; }
+  .icono {
+    width: 44px; height: 44px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--tablero); color: var(--lima);
+  }
+  .tarjeta.oscura .icono { background: var(--tablero-pista); }
+  .tarjeta.lima .icono { background: var(--tablero); }
+  .icono svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .pasos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: paso; }
+  .paso { background: var(--tarjeta); border-radius: 24px; padding: 26px; border: 1px solid var(--borde); }
+  .paso::before {
+    counter-increment: paso; content: counter(paso);
+    display: inline-flex; width: 38px; height: 38px; border-radius: 50%; align-items: center; justify-content: center;
+    background: var(--lima); color: var(--sobre-lima); font-weight: 800;
+  }
+  .paso h3 { margin: 14px 0 6px; font-size: 19px; }
+  .paso p { margin: 0; color: var(--texto-2); font-size: 16px; }
+
+  .datos { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; align-items: stretch; }
+  .lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .lista li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; font-size: 16px; }
+  .lista li::before { content: ''; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%; background: var(--lima); box-shadow: inset 0 0 0 5px var(--tablero); }
+  .tarjeta.oscura .lista li::before { box-shadow: inset 0 0 0 5px var(--tablero-pista); }
+
+  .cierre {
+    margin-top: 84px; background: var(--tablero); color: var(--tablero-texto); border-radius: 36px;
+    padding: 56px 40px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: center;
+  }
+  .cierre h2 { font-size: 36px; line-height: 1.1; margin: 0 0 10px; font-weight: 800; }
+  .cierre p { color: var(--tablero-suave); margin: 0; }
+  .cierre .acciones { display: flex; justify-content: flex-end; }
+
+  footer { padding: 40px 0 48px; color: var(--texto-2); font-size: 14px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .heroe, .datos, .cierre { grid-template-columns: 1fr; }
+    .heroe h1 { font-size: 40px; }
+    .rejilla, .pasos { grid-template-columns: 1fr; }
+    .enlaces a:not(.boton) { display: none; }
+    .cierre { padding: 36px 24px; }
+    .cierre .acciones { justify-content: flex-start; }
+    .titulo h2 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="portada">
+  <div class="ancho">
+    <nav>
+      <a class="marca" href="./" aria-label="Ordenia, inicio">
+        <img class="emblema" src="img/simbolo-claro.svg" alt="">
+        <span class="nombre">Ordenia</span>
+      </a>
+      <div class="enlaces">
+        <a href="#funciones">Funciones</a>
+        <a href="#como">Cómo funciona</a>
+        <a href="#datos">Sus datos</a>
+        <a class="boton chico" href="mailto:juniorbedoy@gmail.com?subject=Quiero%20una%20demostraci%C3%B3n%20de%20Ordenia">Pedir demostración</a>
+      </div>
+    </nav>
+
+    <div class="heroe">
+      <div>
+        <h1>La oficina de su administración, <em>en un solo lugar</em></h1>
+        <p>Ordenia es la aplicación de escritorio para administradores de propiedad horizontal: tareas, llamados de atención, PQRS, reservas y documentos de todos sus conjuntos, con un asistente de inteligencia artificial que redacta por usted y espera su aprobación.</p>
+        <div class="acciones">
+          <a class="boton" href="mailto:juniorbedoy@gmail.com?subject=Quiero%20una%20demostraci%C3%B3n%20de%20Ordenia">Quiero una demostración</a>
+          <a class="boton borde" href="#funciones">Ver qué hace</a>
+        </div>
+        <small>Hecha en Cali por un administrador de propiedad horizontal. Para Windows.</small>
+      </div>
+
+      <div class="ventana" role="img" aria-label="Vista de la pantalla Hoy de Ordenia, con datos de ejemplo">
+        <div class="ventana-barra"><i></i><i></i><i></i></div>
+        <div class="agenda">Su agenda <span class="lima">10:00 · Consejo de administración · Los Almendros</span></div>
+        <div class="cifras">
+          <div class="cifra heroe-cifra">
+            <svg viewBox="0 0 96 96" width="64" height="64" aria-hidden="true">
+              <circle cx="48" cy="48" r="38" fill="none" stroke="#26324a" stroke-width="11"/>
+              <circle cx="48" cy="48" r="38" fill="none" stroke="#c6f16d" stroke-width="11" stroke-linecap="round" stroke-dasharray="172 239" transform="rotate(-90 48 48)"/>
+              <text x="48" y="55" text-anchor="middle" fill="#f2f2ee" font-size="20" font-weight="700" font-family="Urbanist, sans-serif">72%</text>
+            </svg>
+            <div><b>9</b><span>tareas vencidas de 32</span></div>
+          </div>
+          <div class="cifra lima"><b>3</b>vencen hoy</div>
+          <div class="cifra"><b>2</b>plazos legales</div>
+        </div>
+        <div class="barras">
+          <h4>Tareas por conjunto</h4>
+          <div class="barra">Los Almendros <span><i class="v" style="width:22%"></i><i class="a" style="width:46%"></i></span></div>
+          <div class="barra">Torres del Parque <span><i class="v" style="width:8%"></i><i class="a" style="width:38%"></i></span></div>
+          <div class="barra">Villa Verde <span><i class="a" style="width:30%"></i></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="ancho">
+
+  <section id="funciones">
+    <div class="titulo">
+      <span class="pre">Funciones</span>
+      <h2>Todo el trabajo de sus conjuntos, ordenado</h2>
+      <p>Lo que hoy está repartido entre hojas de Excel, chats de WhatsApp y carpetas, en una sola aplicación que todo su equipo comparte.</p>
+    </div>
+    <div class="rejilla">
+      <article class="tarjeta lima">
+        <span class="icono"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span>
+        <h3>Hoy, de un vistazo</h3>
+        <p>Lo vencido, lo que vence hoy y los plazos legales de todos sus conjuntos en una sola pantalla.</p>
+      </article>
+      <article class="tarjeta">
+        <span class="icono"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></span>
+        <h3>Tareas del equipo</h3>
+        <p>Cada persona ve sus tareas; usted ve las de todos. Cada tarea dice quién la creó y quién hizo el último avance.</p>
+      </article>
+      <article class="tarjeta">
+        <span class="icono"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></span>
+        <h3>Llamados y PQRS con plazos</h3>
+        <p>Llamados de atención por etapas y PQRS con su plazo contado en días hábiles, con los festivos de Colombia.</p>
+      </article>
+      <article class="tarjeta oscura">
+        <span class="icono"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></span>
+        <h3>Asistente que redacta</h3>
+        <p>Pídale una circular, un llamado o un informe: lo prepara citando su manual de convivencia y lo deja en la Bandeja para que usted lo apruebe.</p>
+      </article>
+      <article class="tarjeta">
+        <span class="icono"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+        <h3>Calendario y reservas</h3>
+        <p>Reuniones por persona, visitas y reservas de zonas comunes, con carta y correo de confirmación para el residente.</p>
+      </article>
+      <article class="tarjeta">
+        <span class="icono"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+        <h3>Documentos en Word</h3>
+        <p>Cartas, actas e informes con el logo y la firma de su administración, guardados en la carpeta de cada conjunto.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="como">
+    <div class="titulo">
+      <span class="pre">Cómo funciona</span>
+      <h2>Se instala en una tarde</h2>
+    </div>
+    <div class="pasos">
+      <article class="paso">
+        <h3>Instale y elija su carpeta</h3>
+        <p>Ordenia se instala en Windows y guarda todo en una carpeta de Google Drive de su administración.</p>
+      </article>
+      <article class="paso">
+        <h3>Cargue sus conjuntos</h3>
+        <p>Los datos de su administración, sus conjuntos y lo que ya tiene en Excel: tareas, llamados y PQRS.</p>
+      </article>
+      <article class="paso">
+        <h3>Invite a su equipo</h3>
+        <p>Cada persona entra con su cuenta de Google y su rol: dueño, administrador o colaborador.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="datos">
+    <div class="titulo">
+      <span class="pre">Sus datos</span>
+      <h2>La información de sus conjuntos sigue siendo suya</h2>
+    </div>
+    <div class="datos">
+      <article class="tarjeta oscura">
+        <ul class="lista">
+          <li>Los registros viven en la carpeta de Google Drive de su administración y en sus computadores.</li>
+          <li>Cada persona entra con su propia cuenta de Google; las llaves de acceso quedan cifradas en su PC.</li>
+          <li>Nada sale sin aprobación: los documentos, correos y eventos que prepara el asistente esperan en la Bandeja.</li>
+        </ul>
+      </article>
+      <article class="tarjeta">
+        <ul class="lista">
+          <li>Con el modo de privacidad, que viene prendido, Ordenia tapa los datos personales de los residentes antes de consultar a la inteligencia artificial.</li>
+          <li>Con Google, Ordenia solo usa su Calendario y el envío de los correos que usted aprueba. No lee su correo.</li>
+          <li>Sus datos no se venden, no se usan para publicidad ni para entrenar modelos de inteligencia artificial.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <div class="cierre">
+    <div>
+      <h2>¿Quiere verla funcionando?</h2>
+      <p>Le mostramos Ordenia con un conjunto de ejemplo y resolvemos sus preguntas.</p>
+    </div>
+    <div class="acciones">
+      <a class="boton" href="mailto:juniorbedoy@gmail.com?subject=Quiero%20una%20demostraci%C3%B3n%20de%20Ordenia">Pedir demostración</a>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 Ordenia · Cali, Colombia</span>
+    <span><a href="privacidad.html">Política de privacidad</a> · <a href="mailto:juniorbedoy@gmail.com">juniorbedoy@gmail.com</a></span>
+  </footer>
+</main>
+
+</body>
+</html>
